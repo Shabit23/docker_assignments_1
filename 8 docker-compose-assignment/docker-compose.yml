@@ -1,0 +1,32 @@
+version: "3.8"
+
+services: 
+    db:
+        image: mongo:4.0.20-xenial
+        volumes: 
+            - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: mongoadmin
+            MONGO_INITDB_ROOT_PASSWORD: 6a1234567
+            MONGO_INITDB_DATABASE: sampledb
+    nodejs-app:
+        build: 
+            context: ./nodejs-app
+        volumes: 
+            - /usr/app/node_modules
+            - ./nodejs-app:/usr/app
+        environment: 
+            DB_HOST: db
+            DB_PORT: 27017
+            DB_USER: mongoadmin
+            DB_DATABASE: sampledb
+            DB_PASSWORD: 6a1234567
+        ports:
+            - 3000:8080
+    web-app:
+        build:
+            context: ./web-app
+        volumes: 
+            - ./web-app:/usr/app
+        ports: 
+            - 8080:80
